@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: wordpress
+  namespace: default
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/name: wordpress
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/name: wordpress
+  type: ClusterIP
+  sessionAffinity: None

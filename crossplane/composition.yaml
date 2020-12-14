@@ -1,0 +1,70 @@
+kind: Composition
+apiVersion: apiextensions.crossplane.io/v1
+metadata:
+  labels:
+    provider: aws
+  name: compositemysqlinstances.aws.database.example.org
+spec:
+  compositeTypeRef:
+    apiVersion: database.example.org/v1alpha1
+    kind: CompositeMySQLInstance
+  resources:
+    - base:
+        apiVersion: database.aws.crossplane.io/v1beta1
+        kind: RDSInstance
+        spec:
+          forProvider:
+            allocatedStorage: 20
+            autoMinorVersionUpgrade: true
+            availabilityZone: us-east-2a
+            backupRetentionPeriod: 0
+            caCertificateIdentifier: rds-ca-2019
+            copyTagsToSnapshot: false
+            dbInstanceClass: db.t2.medium
+            dbName: wordpress
+            dbSubnetGroupName: mysql-subnet-group
+            deletionProtection: false
+            enableIAMDatabaseAuthentication: false
+            enablePerformanceInsights: false
+            engine: mysql
+            engineVersion: 5.6.35
+            licenseModel: general-public-license
+            masterUsername: admin
+            monitoringInterval: 0
+            multiAZ: false
+            port: 3306
+            publiclyAccessible: false
+            skipFinalSnapshotBeforeDeletion: true
+            storageEncrypted: false
+            storageType: gp2
+            tags:
+              - key: crossplane-kind
+                value: rdsinstance.database.aws.crossplane.io
+              - key: crossplane-name
+                value: mysql-rds
+              - key: crossplane-providerconfig
+                value: default
+            vpcSecurityGroupIds:
+              - sg-04b7bb886a4fa7c4e
+            region: us-east-2
+          providerConfigRef:
+            name: default
+          writeConnectionSecretToRef:
+            namespace: default 
+      connectionDetails:
+        - fromConnectionSecretKey: username
+        - fromConnectionSecretKey: password
+        - fromConnectionSecretKey: endpoint
+        - fromConnectionSecretKey: port
+      patches:
+        - fromFieldPath: metadata.uid
+          toFieldPath: spec.writeConnectionSecretToRef.name
+          transforms:
+            - string:
+                fmt: '%s-mysql'
+              type: string
+          type: FromCompositeFieldPath
+        - fromFieldPath: spec.parameters.storageGB
+          toFieldPath: spec.forProvider.allocatedStorage
+          type: FromCompositeFieldPath
+  writeConnectionSecretsToNamespace: crossplane-system

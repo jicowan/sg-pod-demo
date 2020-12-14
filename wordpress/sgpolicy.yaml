@@ -1,0 +1,14 @@
+kind: SecurityGroupPolicy
+apiVersion: vpcresources.k8s.aws/v1beta1
+metadata:
+  name: mysql-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: wordpress
+      app.kubernetes.io/instance: wordpress
+  securityGroups:
+    groupIds:
+      - sg-08ef474f615518308
+      - sg-0aa173531980b5f4c
